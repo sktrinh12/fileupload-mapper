@@ -1,0 +1,11 @@
+.App {
+  text-align: center;
+}
+
+.input-zone {
+  padding: 20px;
+  border: 5px blue dashed;
+  width: 60%;
+  margin: auto;
+  transition: "border .24s ease-in-out";
+}
