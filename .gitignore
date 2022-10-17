@@ -21,7 +21,7 @@ docs.zip
 archive.zip
 *.xlsx
 *.pyc
-/node_modules
+*/node_modules
 /.pnp
 .pnp.js
 
