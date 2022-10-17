@@ -20,6 +20,7 @@ venv
 docs.zip
 archive.zip
 *.xlsx
+*.pyc
 
 # vim temporary files
 *~
