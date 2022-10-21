@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import DownloadFile from "./Download";
 
+alert("Application url is: " + window.REACT_APP_BACKEND_URL);
+// alert("Application url is: " + process.env.REACT_APP_BACKEND_URL);
+
 function Dropzone() {
   const [project, setProject] = useState("");
   const [cro, setCRO] = useState("");
@@ -52,20 +55,26 @@ function Dropzone() {
     formData.append("cro", cro);
 
     // fetch("https://httpbin.org/post",
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/upload`, {
+    fetch(`${window.REACT_APP_BACKEND_URL}/upload`, {
+      // fetch(`${process.env.REACT_APP_BACKEND_URL}/upload`, {
+      mode: "cors",
       method: "POST",
       body: formData,
     })
       .then((response) => response.json())
       .then((data) => {
         console.log(data.status);
-        setFileNames(data.contents);
+        if (data.contents) {
+          setFileNames(data.contents);
+          setShowDownBtn(true);
+        } else {
+          setShowDownBtn(false);
+          setFileNames(["NONE"]);
+        }
       })
       .catch((error) => {
         console.error(error);
       });
-
-    setShowDownBtn(true);
   };
 
   return (
