@@ -2,14 +2,15 @@ from fastapi import File, UploadFile, FastAPI, Form
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from starlette.responses import FileResponse
+from os import getenv
 import pandas as pd
-
 
 app = FastAPI()
 
 origins = [
     "http://localhost:3000",
-    "localhost:3000"
+    "localhost:3000",
+    "http://fileupmap.frontend.kinnate:3000"
 ]
 
 app.add_middleware(
@@ -45,9 +46,12 @@ def upload(cro: str = Form(), project: str = Form(), files: List[UploadFile] = F
                                 ])
 
             print(df)
-            df.to_excel("file_mapping.xlsx", index=False)
-        except Exception:
-            return {"status": "There was an error uploading the file(s)"}
+            directory = getenv('PARENT_DIR', '') + ('/' if getenv('PARENT_DIR') else '')
+            # with open('test', 'w') as f:
+            #     f.write(batch + '\n')
+            df.to_excel(f"{directory}file_mapping.xlsx", index=False)
+        except Exception as e:
+            return {"status": f"There was an error uploading the file(s) - {e}"}
     contents = [file.filename for file in files]
     return {"status":"Successfully uploaded",
             "contents": contents}
