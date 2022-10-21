@@ -37,6 +37,10 @@ archive.zip
 .env.development.local
 .env.test.local
 .env.production.local
+/frontend/public/env-config.js
+set-env.sh.bk
+env-config.js
+env.sh
 
 npm-debug.log*
 yarn-debug.log*
