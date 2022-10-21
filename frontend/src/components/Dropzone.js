@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import DownloadFile from "./Download";
 
-alert("Application url is: " + window.REACT_APP_BACKEND_URL);
-// alert("Application url is: " + process.env.REACT_APP_BACKEND_URL);
+console.log("backend url is: " + window.REACT_APP_BACKEND_URL);
 
 function Dropzone() {
   const [project, setProject] = useState("");
