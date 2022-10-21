@@ -3,3 +3,4 @@ build
 .dockerignore
 Dockerfile
 *.xlsx
+public/set-env.sh.bk
