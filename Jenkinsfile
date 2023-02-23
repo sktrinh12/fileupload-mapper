@@ -131,8 +131,10 @@ pipeline {
                   --set containers.volumeMounts.mountPath='/usr/share/nginx/html/config.js' \
                   --set containers.volumeMounts.subPath=config.js \
                   --set "volumes.name=fileupmap-config-volume" \
-                  --set "volumes.configMapName=fileupmap-config-map" \
-				--set configValues=window.REACT_APP_BACKEND_URL='http://fileupmap.backend.kinnate'
+                  --set "volumes.configMapName=fileupmap-config-map"
+
+				// couldn't get --set cmd to provision configmap; but upgrade after seems to work
+				helm upgrade k8sapp-$APP_NAME-frontend . --namespace jenkins --reuse-values --set configValues="window.REACT_APP_BACKEND_URL='http://fileupmap.backend.kinnate'\nwindow.REACT_APP_ENVIRONMENT='PROD'"
                 fi
                 '''
 
