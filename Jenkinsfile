@@ -112,7 +112,6 @@ pipeline {
                   ./kubectl create ns $NAMESPACE
                   git clone https://github.com/sktrinh12/helm-basic-app-chart.git
                   cd helm-basic-app-chart
-									ls -ltra
                   helm install k8sapp-$APP_NAME-backend . --set service.namespace=$NAMESPACE \
                   --set service.port=80 --set service.targetPort=8000 --set nameOverride=$APP_NAME-backend \
                   --set fullnameOverride=$APP_NAME-backend --set namespace=${NAMESPACE} \
@@ -133,7 +132,7 @@ pipeline {
                   --set containers.volumeMounts.subPath=config.js \
                   --set "volumes.name=fileupmap-config-volume" \
                   --set "volumes.configMapName=fileupmap-config-map" \
-                  --values config-values/config-prod.yaml
+									--set configValues="window.REACT_APP_BACKEND_URL='http://fileupmap.backend.kinnate'\nwindow.REACT_APP_ENVIRONMENT='PROD'"
                 fi
                 '''
 
