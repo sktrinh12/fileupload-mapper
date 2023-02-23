@@ -132,9 +132,7 @@ pipeline {
                   --set containers.volumeMounts.subPath=config.js \
                   --set "volumes.name=fileupmap-config-volume" \
                   --set "volumes.configMapName=fileupmap-config-map" \
-								  --set configValues="window.REACT_APP_BACKEND_URL='http://fileupmap.backend.kinnate'
-								window.REACT_APP_ENVIRONMENT='PROD'"
-								./kubectl get configmap -n $NAMESPACE
+				--set configValues="window.REACT_APP_BACKEND_URL=http://fileupmap.backend.kinnate\nwindow.REACT_APP_ENVIRONMENT=PROD"
                 fi
                 '''
 
