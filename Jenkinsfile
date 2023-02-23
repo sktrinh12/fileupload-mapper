@@ -42,7 +42,7 @@ pipeline {
                 docker build \
                 --no-cache --network=host \
                 -t ${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend:latest \
-                -f ${WORKSPACE}/${APP_NAME}/backend/Dockerfile.prod .
+                -f ${WORKSPACE}/backend/Dockerfile.prod .
                 ''', returnStdout: true
                 )
                 
@@ -58,7 +58,7 @@ pipeline {
                 docker build \
                 --no-cache --network=host \
                 -t $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend:latest \
-                -f $WORKSPACE/${APP_NAME}/frontend/Dockerfile.prod .
+                -f $WORKSPACE/frontend/Dockerfile.prod .
                 ''', returnStdout: true
                 )
             }
@@ -100,7 +100,6 @@ pipeline {
                 container('helm') {
                 sh script: '''
                 #!/bin/bash
-                cd $WORKSPACE
                 curl -LO https://storage.googleapis.com/kubernetes-release/release/\$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
                 chmod +x ./kubectl
                 if ./kubectl get namespace $NAMESPACE > /dev/null 2>&1; then
