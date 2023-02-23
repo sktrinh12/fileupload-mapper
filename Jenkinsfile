@@ -99,7 +99,6 @@ pipeline {
             steps{
                 container('helm') {
                 sh script: '''
-                #!/bin/bash
                 curl -LO https://storage.googleapis.com/kubernetes-release/release/\$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
                 chmod +x ./kubectl
                 if ./kubectl get namespace $NAMESPACE > /dev/null 2>&1; then
@@ -133,8 +132,8 @@ pipeline {
                   --set "volumes.name=fileupmap-config-volume" \
                   --set "volumes.configMapName=fileupmap-config-map"
 
-				// couldn't get --set cmd to provision configmap; but upgrade after seems to work
-				helm upgrade k8sapp-$APP_NAME-frontend . --namespace jenkins --reuse-values --set configValues="window.REACT_APP_BACKEND_URL='http://fileupmap.backend.kinnate'\nwindow.REACT_APP_ENVIRONMENT='PROD'"
+      # couldn't get --set cmd to provision configmap; but upgrade after seems to work
+      helm upgrade k8sapp-$APP_NAME-frontend . --namespace jenkins --reuse-values --set configValues="window.REACT_APP_BACKEND_URL='http://fileupmap.backend.kinnate'\nwindow.REACT_APP_ENVIRONMENT='PROD'"
                 fi
                 '''
 
