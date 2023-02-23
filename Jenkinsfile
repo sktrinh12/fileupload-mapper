@@ -10,7 +10,6 @@ pipeline {
     }
     environment{
         AWSID = credentials('AWSID')
-        GITHUB_PAT = credentials('github-kinnate-secret-text')
         DOCKER_PSW = credentials('DOCKER_PASSWORD')
         DOCKER_CONFIG = "${WORKSPACE}/docker.config"
         NAMESPACE = 'fileupmap'
@@ -33,17 +32,7 @@ pipeline {
                 }
             }
         }
-        
-        
-        stage('git clone') {
-            steps{
-                sh(script: '''
-                    git clone https://spencertr:$GITHUB_PAT@github.com/Kinnate/$APP_NAME.git
-                ''', returnStdout: true) 
-            }
-        }
-        
-        
+
         stage('docker build backend') {
             steps{
                sh( label: 'Docker Build Backend', script:
@@ -145,7 +134,7 @@ pipeline {
                   --set containers.volumeMounts.subPath=config.js \
                   --set "volumes.name=fileupmap-config-volume" \
                   --set "volumes.configMapName=fileupmap-config-map" \
-                  --values ./config-values/config-prod.yaml
+                  --values config-values/config-prod.yaml
                 fi
                 '''
 
