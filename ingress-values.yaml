@@ -1,0 +1,20 @@
+# values.yaml to pass into --set
+ingress:
+  subnets:
+    - subnet-086ffcb03661d67a2
+    - subnet-0b0b805254e886773
+    - subnet-0a32ac5c4f0324666
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/tags: Environment=dev,Team=kinnate
+    alb.ingress.kubernetes.io/subnets: subnet-086ffcb03661d67a2,subnet-0b0b805254e886773,subnet-0a32ac5c4f0324666
+    alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=600
+  hosts:
+    - name: fileupmap.frontend.kinnate
+      service: fileupload-mapper-frontend-svc
+      port: 80
+    - name: fileupmap.backend.kinnate
+      service: fileupload-mapper-backend-svc
+      port: 80
