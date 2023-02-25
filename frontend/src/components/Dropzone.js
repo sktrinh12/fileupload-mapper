@@ -1,22 +1,26 @@
-import React, { useState } from "react";
-import { useDropzone } from "react-dropzone";
-import DownloadFile from "./Download";
+import React, { useState } from 'react'
+import { useDropzone } from 'react-dropzone'
+import DownloadFile from './Download'
 
-console.log("backend url is: " + window.REACT_APP_BACKEND_URL);
+console.log('backend url is: ' + window.REACT_APP_BACKEND_URL)
 
 function Dropzone() {
-  const [project, setProject] = useState("");
-  const [cro, setCRO] = useState("");
-  const [showDownBtn, setShowDownBtn] = useState(false);
-  const [fileNames, setFileNames] = useState([]);
+  const [project, setProject] = useState('KIN-')
+  const [cro, setCRO] = useState('Pharmaron')
+  const [showDownBtn, setShowDownBtn] = useState(false)
+  const [fileNames, setFileNames] = useState([])
+  const [xlsxFiles, setXlsxFiles] = useState([])
 
   const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
     useDropzone({
       accept: {
-        "image/jpeg": [".jpeg", ".png"],
-        "text/html": [".pdf"],
+        'image/jpeg': ['.jpeg', '.png'],
+        'text/html': ['.pdf'],
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
+          '.xlsx',
+        ],
       },
-    });
+    })
 
   const acceptedFileItems = acceptedFiles.map((file) => {
     // console.log(file.path);
@@ -24,8 +28,8 @@ function Dropzone() {
       <li key={file.path}>
         {file.path} - {file.size} bytes
       </li>
-    );
-  });
+    )
+  })
 
   const fileRejectionItems = fileRejections.map(({ file, errors }) => {
     return (
@@ -37,48 +41,59 @@ function Dropzone() {
           ))}
         </ul>
       </li>
-    );
-  });
+    )
+  })
 
   const handleUpload = (event) => {
     // console.log(acceptedFiles);
-    if (acceptedFiles.length === 0 && !project && !cro) return;
-    let formData = new FormData();
+    if (acceptedFiles.length === 0 && !project && !cro) return
+    let formData = new FormData()
     for (let file of acceptedFiles) {
-      formData.append("files", file);
+      formData.append('files', file)
     }
 
     // console.log(project);
     // console.log(cro);
-    formData.append("project", project);
-    formData.append("cro", cro);
+    const checkXlsxFiles = acceptedFiles.filter((file) =>
+      file.name.endsWith('.xlsx')
+    )
+    if (checkXlsxFiles.length === 0) {
+      formData.append('project', project)
+      formData.append('cro', cro)
+    }
+    setXlsxFiles(checkXlsxFiles)
 
     // fetch("https://httpbin.org/post",
     fetch(`${window.REACT_APP_BACKEND_URL}/upload`, {
       // fetch(`${process.env.REACT_APP_BACKEND_URL}/upload`, {
-      mode: "cors",
-      method: "POST",
+      mode: 'cors',
+      method: 'POST',
       body: formData,
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data.status);
+        console.log(data.status)
         if (data.contents) {
-          setFileNames(data.contents);
-          setShowDownBtn(true);
+          setFileNames(data.contents)
+          setShowDownBtn(true)
         } else {
-          setShowDownBtn(false);
-          setFileNames(["NONE"]);
+          setShowDownBtn(false)
+          setFileNames(['NONE'])
         }
       })
       .catch((error) => {
-        console.error(error);
-      });
-  };
+        console.error(error)
+      })
+  }
 
   return (
-    <div className="container">
-      <div className="input-zone" {...getRootProps()}>
+    <div className='container'>
+      <div
+        className='input-zone'
+        {...getRootProps({
+          onClick: () => setShowDownBtn(false),
+        })}
+      >
         <input {...getInputProps()} />
         <h2>
           <p>Drag 'n' drop some files here, or click to select files</p>
@@ -94,37 +109,41 @@ function Dropzone() {
             consectutively added files.
           </p>
         </em>
-        <em>(Only *.jpeg, *.png, *.pdf files will be accepted)</em>
+        <em>(Only *.jpeg, *.png, *.pdf, *.xlsx files will be accepted)</em>
       </div>
       {acceptedFiles.length > 0 && (
         <>
           <h4>Accepted files</h4>
           <ul>{acceptedFileItems}</ul>
           <div>
-            <label>
-              <b>PROJECT</b>
-              <input
-                id="project-id"
-                type="text"
-                placeholder="Enter project"
-                onChange={(e) => {
-                  setProject(e.target.value);
-                }}
-              />
-            </label>
-            <label>
-              <b>CRO</b>
-              <input
-                id="cro-id"
-                type="text"
-                placeholder="Enter CRO"
-                onChange={(e) => {
-                  setCRO(e.target.value);
-                }}
-              />
-            </label>
+            {xlsxFiles.length === 0 && (
+              <>
+                <label>
+                  <b>PROJECT</b>
+                  <input
+                    id='project-id'
+                    type='text'
+                    value={project}
+                    onChange={(e) => {
+                      setProject(e.target.value)
+                    }}
+                  />
+                </label>
+                <label>
+                  <b>CRO</b>
+                  <input
+                    id='cro-id'
+                    type='text'
+                    value={cro}
+                    onChange={(e) => {
+                      setCRO(e.target.value)
+                    }}
+                  />
+                </label>
+              </>
+            )}
           </div>
-          <button style={{ marginTop: "12px" }} onClick={handleUpload}>
+          <button style={{ marginTop: '12px' }} onClick={handleUpload}>
             Submit
           </button>
 
@@ -138,7 +157,7 @@ function Dropzone() {
         </>
       )}
     </div>
-  );
+  )
 }
 
-export default Dropzone;
+export default Dropzone
