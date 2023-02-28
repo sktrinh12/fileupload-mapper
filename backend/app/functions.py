@@ -39,7 +39,7 @@ async def parse_xlsx(file):
                 "Filename": [file.filename for _ in range(len(cell_vals))],
             },
         )
-        print(df)
+        # print(df)
         return df
 
 
