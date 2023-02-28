@@ -29,7 +29,7 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Kinnate": "File Upload"}
 
 
 @app.post("/upload")
@@ -40,7 +40,7 @@ async def upload(
 ):
 
     df_list = []
-    contents = [file.filename for file in files]
+    df = pd.DataFrame(columns=["Batch ID", "Fiename"])
     # print(files[0])
     for file in files:
         # print(file.filename)
@@ -51,13 +51,21 @@ async def upload(
             else:
                 df = parse_generic(file, cro, project)
             # Generate Excel file as byte stream
+
             if file.filename.endswith(".xlsx"):
                 df = pd.concat(df_list, ignore_index=True)
             with pd.ExcelWriter(excel_file, engine="xlsxwriter") as writer:
                 df.to_excel(writer, index=False)
         except Exception as e:
             raise HTTPException(status_code=404, detail=e)
-    return {"status": "Successfully uploaded", "contents": contents}
+
+    resp = {
+        "status": "Successfully uploaded",
+        "file_names": df["Filename"].tolist(),
+    }
+    if df_list:
+        resp["batch_ids"] = df["Batch ID"].tolist()
+    return resp
 
 
 @app.get("/download")
