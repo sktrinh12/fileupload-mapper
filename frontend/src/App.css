@@ -7,5 +7,18 @@
   border: 5px blue dashed;
   width: 60%;
   margin: auto;
-  transition: "border .24s ease-in-out";
+  transition: 'border .24s ease-in-out';
+}
+
+table,
+td,
+th,
+tr {
+  border: 1px solid black;
+  margin: auto; /* center the table horizontally */
+}
+
+ul {
+  list-style-position: inside;
+  padding-left: 0;
 }
