@@ -67,7 +67,7 @@ function App() {
       })
       .catch((error) => {
         console.error(error)
-        alert(`Error uploading files. ${error.slice(0, 30)} ...`)
+        alert(`!X! Error: ${error}`)
       })
   }
 
