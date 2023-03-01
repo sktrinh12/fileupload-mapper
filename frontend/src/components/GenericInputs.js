@@ -11,24 +11,26 @@ const GenericInput = ({ xlsxFiles }) => {
     fileNames,
   } = useContext(GenInputContext)
   return xlsxFiles.length > 0 ? (
-    <table>
-      <tbody>
-        {batchIDs.map((b, i) => (
-          <tr key={`batch_${i}`}>
-            <td>
-              {/*<input
+    batchIDs.length > 0 && (
+      <table>
+        <tbody>
+          {batchIDs.map((b, i) => (
+            <tr key={`batch_${i}`}>
+              <td>
+                {/*<input
                     type='text'
                     value={b}
                     onChange={(e) => handleBatchIDChange(i, e.target.value)}
                   />
 								*/}
-              {b}
-            </td>
-            <td>{fileNames[i]}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+                {b}
+              </td>
+              <td>{fileNames[i]}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )
   ) : (
     <>
       <label>
