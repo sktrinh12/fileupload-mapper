@@ -50,23 +50,28 @@ function Dropzone({
 
   return (
     <div className='container'>
-      <div className='input-zone' {...getRootProps({})}>
+      <div className='input-zone' {...getRootProps()}>
         <input {...getInputProps()} />
         <h2>
           <p>Drag 'n' drop some files here, or click to select files</p>
         </h2>
         <em>
           <p>
-            Please ensure the set of files only has one FT number, do not mix
-            and match.
+            For Analytical Chem Files, please ensure the set of files only has
+            one FT number, do not mix and match.
           </p>
-
           <p>
-            Also, can only execute a set of files at a time. Cannot execute
-            consectutively added files.
+            For <code> .xlsx </code> files, it is possible to mix and match
+            since it will parse the actual file.
+          </p>
+          <p>
+            Only able to execute a set of files at a time. Cannot execute
+            consecutively added files.
           </p>
         </em>
-        <em>(Only *.jpeg, *.png, *.pdf, *.xlsx files will be accepted)</em>
+        <em>
+          (<code> *.jpeg, *.png, *.pdf, *.xlsx</code> files will be accepted)
+        </em>
       </div>
       {acceptedFiles.length > 0 && (
         <>
