@@ -35,7 +35,7 @@ async def parse_xlsx(file):
 
         df = pd.DataFrame(
             {
-                "Batch ID": list(cell_vals),
+                "Batch_ID": list(cell_vals),
                 "Filename": [file.filename for _ in range(len(cell_vals))],
             },
         )
