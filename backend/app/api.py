@@ -40,20 +40,18 @@ async def upload(
 ):
 
     df_list = []
-    df = pd.DataFrame(columns=["Batch ID", "Fiename"])
+    df = pd.DataFrame(columns=["Batch_ID", "Fiename"])
     # print(files[0])
     for file in files:
         # print(file.filename)
         try:
             if file.filename.endswith(".xlsx"):
                 df = await parse_xlsx(file)
-                df_list.append(df)
             else:
                 df = parse_generic(file, cro, project)
             # Generate Excel file as byte stream
-
-            if file.filename.endswith(".xlsx"):
-                df = pd.concat(df_list, ignore_index=True)
+            df_list.append(df)
+            df = pd.concat(df_list, ignore_index=True)
             with pd.ExcelWriter(excel_file, engine="xlsxwriter") as writer:
                 df.to_excel(writer, index=False)
         except Exception as e:
@@ -62,9 +60,8 @@ async def upload(
     resp = {
         "status": "Successfully uploaded",
         "file_names": df["Filename"].tolist(),
+        "batch_ids": df["Batch_ID"].tolist(),
     }
-    if df_list:
-        resp["batch_ids"] = df["Batch ID"].tolist()
     return resp
 
 
