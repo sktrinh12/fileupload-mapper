@@ -22,3 +22,12 @@ ul {
   list-style-position: inside;
   padding-left: 0;
 }
+
+.code {
+  background-color: #f2f2f2; /* set background color to a light grey */
+  padding: 5px; /* add some padding to the code block */
+  border-radius: 3px; /* round the corners of the block */
+  font-family: monospace; /* set the font to a monospace font */
+  font-size: 14px; /* set the font size to a readable size */
+  color: #e93826; /* set the text color to a dark grey */
+}
