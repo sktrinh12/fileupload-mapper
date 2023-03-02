@@ -57,12 +57,13 @@ function Dropzone({
         </h2>
         <em>
           <p>
-            For <code>Analytical Chem Files</code>, please ensure the set of
-            files only has one FT number, do not mix and match.
+            For <code className='code'>Analytical Chem Files</code>, please
+            ensure the set of files only has one FT number, do not mix and
+            match.
           </p>
           <p>
-            For <code> .xlsx </code> files, it is possible to mix and match
-            since it will parse the actual file.
+            For <code className='code'>.xlsx</code> files, it is possible to mix
+            and match since it will parse the actual file.
           </p>
           <p>
             Only able to execute a set of files at a time; cannot execute
@@ -70,7 +71,8 @@ function Dropzone({
           </p>
         </em>
         <em>
-          <code> *.jpeg, *.png, *.pdf, *.xlsx</code> files will be accepted
+          <code className='code'>*.jpeg, *.png, *.pdf, *.xlsx</code> files will
+          be accepted
         </em>
       </div>
       {acceptedFiles.length > 0 && (
