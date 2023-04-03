@@ -13,6 +13,7 @@ function App() {
   const [fileNames, setFileNames] = useState([])
   const [isDisabled, setIsDisabled] = useState(false)
   const [batchIDs, setBatchIDs] = useState([])
+  const [loading, setLoading] = useState(false)
 
   const handleChangeProj = (e) => {
     setProject(e.target.value)
@@ -42,6 +43,7 @@ function App() {
       formData.append('files', file)
     }
 
+    setLoading(true)
     formData.append('project', project)
     formData.append('cro', cro)
     // console.log(project);
@@ -69,6 +71,9 @@ function App() {
         console.error(error)
         alert(`!X! Error: ${error}`)
       })
+      .finally(() => {
+        setLoading(false)
+      })
   }
 
   return (
@@ -89,6 +94,7 @@ function App() {
           fileNames={fileNames}
           handleUpload={handleUpload}
           isDisabled={isDisabled}
+          loading={loading}
         />
       </div>
     </GenInputContext.Provider>
