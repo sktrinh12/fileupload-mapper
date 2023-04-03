@@ -1,6 +1,8 @@
-function DownloadFile(props) {
+import { useContext } from 'react'
+import GenInputContext from './GenInputContext'
+
+function DownloadFile() {
   const date = new Date()
-  const maxChars = 20
   const months = [
     'JAN',
     'FEB',
@@ -15,7 +17,11 @@ function DownloadFile(props) {
     'NOV',
     'DEC',
   ]
+
+  const { batchIDs } = useContext(GenInputContext)
+
   const downloadExcelFile = () => {
+    let uniqueBatchIds = new Set()
     fetch(`${window.REACT_APP_BACKEND_URL}/download`).then((response) => {
       // fetch(`${process.env.REACT_APP_BACKEND_URL}/download`).then((response) => {
       response.blob().then((blob) => {
@@ -24,12 +30,11 @@ function DownloadFile(props) {
         let today = `${
           months[date.getMonth()]
         }-${date.getDate()}-${date.getFullYear()}`
-        let filenames = props.filenames
-          .map((f) => {
-            console.log(f)
-            return f.split('.')[0].slice(0, maxChars)
-          })
-          .join('__')
+        for (let i = 0; i < batchIDs.length; i++) {
+          uniqueBatchIds.add(batchIDs[i])
+        }
+        let filenames = Array.from(uniqueBatchIds).join('__')
+        console.log(filenames)
         a.href = url
         a.download = `file-mapping-${filenames}--${today}.xlsx`
         a.click()
