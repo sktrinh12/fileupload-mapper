@@ -19,6 +19,13 @@ function Dropzone({
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
           '.xlsx',
         ],
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+          ['.docx'],
+        'application/vnd.ms-excel': ['.xls'],
+        'application/x-graphpad-prism-pzfx': ['.pzfx'],
+        'application/vnd.ms-powerpoint': ['.ppt'],
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+          ['.pptx'],
       },
       onDrop: handleResetDropzone,
     })
@@ -45,7 +52,9 @@ function Dropzone({
     )
   })
 
-  const xlsxFiles = acceptedFiles.filter((file) => file.name.endsWith('.xlsx'))
+  const xlsxFiles = acceptedFiles.filter(
+    (file) => file.name.endsWith('.xlsx') || file.name.endsWith('.xls')
+  )
   // console.log(xlsxFiles)
 
   return (
@@ -71,8 +80,10 @@ function Dropzone({
           </p>
         </em>
         <em>
-          <code className='code'>*.jpeg, *.png, *.pdf, *.xlsx</code> files will
-          be accepted
+          <code className='code'>
+            *.jpeg, *.pdf, *.png, *.ppt, *.pptx, *.pzfx, *.xls, *.xlsx
+          </code>{' '}
+          files will be accepted
         </em>
       </div>
       {acceptedFiles.length > 0 && (
