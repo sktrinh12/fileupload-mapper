@@ -4,7 +4,7 @@ import pandas as pd
 from os import getenv
 import tempfile
 
-pattern = r"^FT\d+-\d+\S+"
+pattern = r"FT\d+-\d+"
 
 
 async def parse_xlsx(file):
@@ -57,6 +57,24 @@ def parse_generic(file, cro, project):
             "Doc_type",
             "CRO",
             "Project",
+        ],
+    )
+
+    print(df)
+    return df
+
+
+def parse_other_file_types(file):
+    lst = []
+    matches = re.findall(pattern, file.filename)
+    if matches:
+        for match in matches:
+            lst.append([match, file.filename])
+    df = pd.DataFrame(
+        lst,
+        columns=[
+            "Batch_ID",
+            "Filename",
         ],
     )
 
