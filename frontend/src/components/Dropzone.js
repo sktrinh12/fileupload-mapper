@@ -1,6 +1,8 @@
 import { useDropzone } from 'react-dropzone'
 import DownloadFile from './Download'
 import GenericInputs from './GenericInputs'
+import Box from '@mui/material/Box'
+import ReactLoading from 'react-loading'
 
 console.log('backend url is: ' + window.REACT_APP_BACKEND_URL)
 
@@ -10,6 +12,7 @@ function Dropzone({
   handleResetDropzone,
   handleUpload,
   isDisabled,
+  loading,
 }) {
   const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
     useDropzone({
@@ -86,21 +89,40 @@ function Dropzone({
           files will be accepted
         </em>
       </div>
-      {acceptedFiles.length > 0 && (
-        <>
-          <h4>Accepted files</h4>
-          <ul>{acceptedFileItems}</ul>
-          <GenericInputs xlsxFiles={xlsxFiles} />
-          <button
-            style={{ marginTop: '12px' }}
-            onClick={(e) => handleUpload(e, acceptedFiles)}
-            disabled={isDisabled}
+      {acceptedFiles.length > 0 &&
+        (loading ? (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100vh',
+            }}
           >
-            Submit
-          </button>
-          {showDownBtn && <DownloadFile filenames={fileNames} />}
-        </>
-      )}
+            <div style={{ margin: 'auto', padding: '10px' }}>
+              <ReactLoading
+                type='spin'
+                color={'#343990ff'}
+                height={667}
+                width={375}
+              />
+            </div>
+          </Box>
+        ) : (
+          <>
+            <h4>Accepted files</h4>
+            <ul>{acceptedFileItems}</ul>
+            <GenericInputs xlsxFiles={xlsxFiles} />
+            <button
+              style={{ marginTop: '12px' }}
+              onClick={(e) => handleUpload(e, acceptedFiles)}
+              disabled={isDisabled}
+            >
+              Submit
+            </button>
+            {showDownBtn && <DownloadFile filenames={fileNames} />}
+          </>
+        ))}
       {fileRejections.length > 0 && (
         <>
           <h4>Rejected files</h4>
