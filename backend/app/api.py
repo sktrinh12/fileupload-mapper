@@ -4,9 +4,10 @@ from typing import List
 
 # from starlette.responses import FileResponse
 from fastapi.responses import StreamingResponse
-from .functions import parse_xlsx, parse_generic, pd
+from .functions import parse_xlsx, parse_generic, parse_other_file_types, pd
 import io
 import xlsxwriter
+from os.path import splitext
 
 app = FastAPI()
 
@@ -47,8 +48,10 @@ async def upload(
         try:
             if file.filename.endswith(".xlsx"):
                 df = await parse_xlsx(file)
-            else:
+            elif file.filename.endswith(".pdf"):
                 df = parse_generic(file, cro, project)
+            else:
+                df = parse_other_file_types(file)
             # Generate Excel file as byte stream
             df_list.append(df)
             df = pd.concat(df_list, ignore_index=True)
