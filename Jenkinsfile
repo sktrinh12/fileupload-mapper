@@ -38,20 +38,17 @@ pipeline {
         }
 
         stage('docker build backend') {
+            when { expression { params.BUILD_BACKEND.toString().toLowerCase() == 'true' }
+            }
             steps{
                sh( label: 'Docker Build Backend', script:
                '''
                 #!/bin/bash
                 set -x
-                ls -ltra
-                if [ "$BUILD_BACKEND" == true ]; then
-                  docker build \
-                  --no-cache --network=host \
-                  -t ${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend:latest \
-                  -f backend/Dockerfile.prod .
-                else
-                  echo "skipping backend build"
-                fi
+                docker build \
+                --no-cache --network=host \
+                -t ${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend:latest \
+                -f backend/Dockerfile.prod .
                 ''', returnStdout: true
                 )
                 
@@ -59,47 +56,46 @@ pipeline {
         }
         
         stage('docker build frontend') {
+            when { expression { params.BUILD_FRONTEND.toString().toLowerCase() == 'true' }
+            }
             steps{
                 sh( label: 'Docker Build Frontend', script:
                 '''
                 #!/bin/bash
                 set -x
-                if [ "$BUILD_FRONTEND" == true ]; then
-                  docker build \
-                  --no-cache --network=host \
-                  -t $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend:latest \
-                  -f frontend/Dockerfile.prod .
-                else
-                  echo "skipping frontend build"
-                fi
+                docker build \
+                --no-cache --network=host \
+                -t $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend:latest \
+                -f frontend/Dockerfile.prod .
                 ''', returnStdout: true
                 )
             }
         }
         
     
-        stage('docker push to ecr') {
+        stage('docker push frontend to ecr') {
+            when { expression { params.BUILD_FRONTEND.toString().toLowerCase() == 'true' }
+            }
             steps {
                 sh(label: 'ECR docker push frontend', script:
                 '''
                 #!/bin/bash
                 set -x
-                if [ "$BUILD_FRONTEND" == true ]; then
-                  docker push $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend:latest
-                else
-                  echo "skipping frontend image push"
-                fi
+                docker push $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend:latest
                 ''', returnStdout: true
                 )
+            }
+        }
+
+        stage('docker push backend to ecr') {
+          when { expression { params.BUILD_BACKEND.toString().toLowerCase() == 'true' }
+          }
+          steps {
                 sh(label: 'ECR docker push backend', script:
                 '''
                 #!/bin/bash
                 set -x
-                if [ "$BUILD_BACKEND" == true ]; then
-                  docker push $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend:latest
-                else
-                  echo "skipping backend image push"
-                fi
+                docker push $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend:latest
                 ''', returnStdout: true
                 )
             }
