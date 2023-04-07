@@ -82,6 +82,8 @@ pipeline {
             steps {
                 sh(label: 'ECR docker push frontend', script:
                 '''
+                #!/bin/bash
+                set -x
                 if [[ "$BUILD_FRONTEND" == true ]]; then
                   docker push $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend:latest
                 else
@@ -91,6 +93,8 @@ pipeline {
                 )
                 sh(label: 'ECR docker push backend', script:
                 '''
+                #!/bin/bash
+                set -x
                 if [[ "$BUILD_BACKEND" == true ]]; then
                   docker push $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend:latest
                 else
@@ -120,6 +124,8 @@ pipeline {
             steps{
                 container('helm') {
                 sh script: '''
+                #!/bin/bash
+                set -x
                 curl -LO https://storage.googleapis.com/kubernetes-release/release/\$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
                 chmod +x ./kubectl
                 if ./kubectl get namespace $NAMESPACE > /dev/null 2>&1; then
