@@ -124,8 +124,8 @@ pipeline {
                 set -x
                 curl -LO https://storage.googleapis.com/kubernetes-release/release/\$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
                 chmod +x ./kubectl
-                if ./kubectl get namespace $NAMESPACE > /dev/null 2>&1; then
-                  echo "Namespace $NAMESPACE already exists"
+                if ./kubectl get pod -n $NAMESPACE -l app=$APP_NAME > /dev/null 2>&1; then
+                  echo "$APP_NAME pods already exists"
                   if [[ "$BUILD_BACKEND" == true ]]; then
                     ./kubectl rollout restart deploy/$APP_NAME-backend-deploy -n $NAMESPACE
                   else
@@ -148,7 +148,7 @@ pipeline {
                     --set fullnameOverride=$APP_NAME-backend --set namespace=${NAMESPACE} \
                     --set image.repository=${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend \
                     --set image.tag=latest --set containers.name=fastapi \
-                    --set containers.ports.containerPort=80 --set app=fileupmap \
+                    --set containers.ports.containerPort=80 --set app=$APP_NAME \
                     --set terminationGracePeriodSeconds=10
                   else
                     echo "skipping helm install of backend"
@@ -160,7 +160,7 @@ pipeline {
                     --set fullnameOverride=$APP_NAME-frontend --set namespace=${NAMESPACE} \
                     --set image.repository=${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend \
                     --set image.tag=latest --set containers.name=react \
-                    --set containers.ports.containerPort=80 --set app=fileupmap \
+                    --set containers.ports.containerPort=80 --set app=$APP_NAME \
                     --set terminationGracePeriodSeconds=10 \
                     --set containers.volumeMounts.name=fileupmap-config-volume \
                     --set containers.volumeMounts.mountPath='/usr/share/nginx/html/config.js' \
