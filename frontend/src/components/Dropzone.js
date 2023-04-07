@@ -1,8 +1,9 @@
 import { useDropzone } from 'react-dropzone'
 import DownloadFile from './Download'
-import GenericInputs from './GenericInputs'
+import TableOutput from './TableOutput'
 import Box from '@mui/material/Box'
 import ReactLoading from 'react-loading'
+import PDFInputs from './PDFInputs'
 
 console.log('backend url is: ' + window.REACT_APP_BACKEND_URL)
 
@@ -60,6 +61,9 @@ function Dropzone({
   )
   // console.log(xlsxFiles)
 
+  const hasPdf = acceptedFiles.some((file) => file.name.endsWith('.pdf'))
+  // console.log(hasPdf)
+
   return (
     <div className='container'>
       <div className='input-zone' {...getRootProps()}>
@@ -112,7 +116,7 @@ function Dropzone({
           <>
             <h4>Accepted files</h4>
             <ul>{acceptedFileItems}</ul>
-            <GenericInputs xlsxFiles={xlsxFiles} />
+            {hasPdf ? <PDFInputs /> : <TableOutput xlsxFiles={xlsxFiles} />}
             <button
               style={{ marginTop: '12px' }}
               onClick={(e) => handleUpload(e, acceptedFiles)}
