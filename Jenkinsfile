@@ -5,6 +5,10 @@ pipeline {
             inheritFrom 'jenkins-slave'
         }
     }
+    parameters {
+				booleanParam defaultValue: true, description: 'build the frontend', name: 'BUILD_FRONTEND'
+				booleanParam defaultValue: false, description: 'build the backend', name: 'BUILD_BACKEND'
+		}
     options {
         timeout(time: 5, unit: 'MINUTES')
     }
@@ -12,7 +16,7 @@ pipeline {
         AWSID = credentials('AWSID')
         DOCKER_PSW = credentials('DOCKER_PASSWORD')
         DOCKER_CONFIG = "${WORKSPACE}/docker.config"
-        NAMESPACE = 'fileupmap'
+        NAMESPACE = 'apps'
         APP_NAME = 'fileupload-mapper'
         AWS_PAGER = ''
     }
@@ -39,10 +43,15 @@ pipeline {
                '''
                 #!/bin/bash
                 set -x
-                docker build \
-                --no-cache --network=host \
-                -t ${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend:latest \
-                -f ${WORKSPACE}/backend/Dockerfile.prod .
+                ls -ltra
+                if [[ $BUILD_BACKEND == true ]]; then
+                  docker build \
+                  --no-cache --network=host \
+                  -t ${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend:latest \
+                  -f backend/Dockerfile.prod .
+                else
+                  echo "skipping backend build"
+                fi
                 ''', returnStdout: true
                 )
                 
@@ -55,10 +64,14 @@ pipeline {
                 '''
                 #!/bin/bash
                 set -x
-                docker build \
-                --no-cache --network=host \
-                -t $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend:latest \
-                -f $WORKSPACE/frontend/Dockerfile.prod .
+                if [[ $BUILD_FRONTEND == true ]]; then
+                  docker build \
+                  --no-cache --network=host \
+                  -t $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend:latest \
+                  -f frontend/Dockerfile.prod .
+                else
+                  echo "skipping frontend build"
+                fi
                 ''', returnStdout: true
                 )
             }
@@ -69,12 +82,20 @@ pipeline {
             steps {
                 sh(label: 'ECR docker push frontend', script:
                 '''
-                docker push $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend:latest
+                if [[ $BUILD_FRONTEND == true ]]; then
+                  docker push $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend:latest
+                else
+                  echo "skipping frontend image push"
+                fi
                 ''', returnStdout: true
                 )
                 sh(label: 'ECR docker push backend', script:
                 '''
-                docker push $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend:latest
+                if [[ $BUILD_BACKEND == true ]]; then
+                  docker push $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend:latest
+                else
+                  echo "skipping backend image push"
+                fi
                 ''', returnStdout: true
                 )
             }
@@ -103,37 +124,54 @@ pipeline {
                 chmod +x ./kubectl
                 if ./kubectl get namespace $NAMESPACE > /dev/null 2>&1; then
                   echo "Namespace $NAMESPACE already exists"
-                  ./kubectl rollout restart deploy/$APP_NAME-backend-deploy -n $NAMESPACE
+                  if [[ $BUILD_BACKEND == true ]]; then
+                    ./kubectl rollout restart deploy/$APP_NAME-backend-deploy -n $NAMESPACE
+                  else
+                    echo "skipping kubectl rollout for backend"
+                  fi
                   sleep 5
-                  ./kubectl rollout restart deploy/$APP_NAME-frontend-deploy -n $NAMESPACE
+                  if [[ $BUILD_FRONTEND == true ]]; then
+                    ./kubectl rollout restart deploy/$APP_NAME-frontend-deploy -n $NAMESPACE
+                  else
+                    echo "skipping kubectl rollout for frontend"
+                  fi
                 else
                   echo "Namespace $NAMESPACE does not exist; deploy using helm"
                   ./kubectl create ns $NAMESPACE
                   git clone https://github.com/sktrinh12/helm-basic-app-chart.git
                   cd helm-basic-app-chart
-                  helm install k8sapp-$APP_NAME-backend . --set service.namespace=$NAMESPACE \
-                  --set service.port=80 --set service.targetPort=8000 --set nameOverride=$APP_NAME-backend \
-                  --set fullnameOverride=$APP_NAME-backend --set namespace=${NAMESPACE} \
-                  --set image.repository=${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend \
-                  --set image.tag=latest --set containers.name=fastapi \
-                  --set containers.ports.containerPort=8000 --set app=fileupmap \
-                  --set terminationGracePeriodSeconds=10
+                  if [[ $BUILD_BACKEND == true ]]; then
+                    helm install k8sapp-$APP_NAME-backend . --namespace $NAMESPACE --set service.namespace=$NAMESPACE \
+                    --set service.port=80 --set service.targetPort=8000 --set nameOverride=$APP_NAME-backend \
+                    --set fullnameOverride=$APP_NAME-backend --set namespace=${NAMESPACE} \
+                    --set image.repository=${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend \
+                    --set image.tag=latest --set containers.name=fastapi \
+                    --set containers.ports.containerPort=8000 --set app=fileupmap \
+                    --set terminationGracePeriodSeconds=10
+                  else
+                    echo "skipping helm install of backend"
+                  fi
                   sleep 2
-                  helm install k8sapp-$APP_NAME-frontend . --set service.namespace=$NAMESPACE \
-                  --set service.port=80 --set service.targetPort=80 --set nameOverride=$APP_NAME-frontend \
-                  --set fullnameOverride=$APP_NAME-frontend --set namespace=${NAMESPACE} \
-                  --set image.repository=${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend \
-                  --set image.tag=latest --set containers.name=react \
-                  --set containers.ports.containerPort=80 --set app=fileupmap \
-                  --set terminationGracePeriodSeconds=10 \
-                  --set containers.volumeMounts.name=fileupmap-config-volume \
-                  --set containers.volumeMounts.mountPath='/usr/share/nginx/html/config.js' \
-                  --set containers.volumeMounts.subPath=config.js \
-                  --set "volumes.name=fileupmap-config-volume" \
-                  --set "volumes.configMapName=fileupmap-config-map"
+                  if [[ $BUILD_FRONTEND == true ]]; then
+                    helm install k8sapp-$APP_NAME-frontend . --namespace $NAMESPACE --set service.namespace=$NAMESPACE \
+                    --set service.port=80 --set service.targetPort=80 --set nameOverride=$APP_NAME-frontend \
+                    --set fullnameOverride=$APP_NAME-frontend --set namespace=${NAMESPACE} \
+                    --set image.repository=${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend \
+                    --set image.tag=latest --set containers.name=react \
+                    --set containers.ports.containerPort=80 --set app=fileupmap \
+                    --set terminationGracePeriodSeconds=10 \
+                    --set containers.volumeMounts.name=fileupmap-config-volume \
+                    --set containers.volumeMounts.mountPath='/usr/share/nginx/html/config.js' \
+                    --set containers.volumeMounts.subPath=config.js \
+                    --set "volumes.name=fileupmap-config-volume" \
+                    --set "volumes.configMapName=fileupmap-config-map"
 
-      # couldn't get --set cmd to provision configmap; but upgrade after seems to work
-      helm upgrade k8sapp-$APP_NAME-frontend . --namespace jenkins --reuse-values --set configValues="window.REACT_APP_BACKEND_URL='http://fileupmap.backend.kinnate'\nwindow.REACT_APP_ENVIRONMENT='PROD'"
+                    # couldn't get --set cmd to provision configmap; but upgrade after seems to work
+                    helm upgrade k8sapp-$APP_NAME-frontend . --namespace $NAMESPACE --reuse-values \
+                    --set configValues="window.REACT_APP_BACKEND_URL='http://fileupmap.backend.kinnate'\nwindow.REACT_APP_ENVIRONMENT='PROD'"
+                  else
+                    echo "skipping helm install of frontend"
+                  fi
                 fi
                 '''
 
