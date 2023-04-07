@@ -6,8 +6,8 @@ pipeline {
         }
     }
     parameters {
-				booleanParam defaultValue: true, description: 'build the frontend', name: 'BUILD_FRONTEND'
-				booleanParam defaultValue: false, description: 'build the backend', name: 'BUILD_BACKEND'
+				booleanParam(defaultValue: true, description: 'build the frontend', name: 'BUILD_FRONTEND')
+				booleanParam(defaultValue: false, description: 'build the backend', name: 'BUILD_BACKEND')
 		}
     options {
         timeout(time: 5, unit: 'MINUTES')
