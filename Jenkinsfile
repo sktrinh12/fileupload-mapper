@@ -144,11 +144,11 @@ pipeline {
                   cd helm-basic-app-chart
                   if [[ "$BUILD_BACKEND" == true ]]; then
                     helm install k8sapp-$APP_NAME-backend . --namespace $NAMESPACE --set service.namespace=$NAMESPACE \
-                    --set service.port=80 --set service.targetPort=8000 --set nameOverride=$APP_NAME-backend \
+                    --set service.port=80 --set --set nameOverride=$APP_NAME-backend \
                     --set fullnameOverride=$APP_NAME-backend --set namespace=${NAMESPACE} \
                     --set image.repository=${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend \
                     --set image.tag=latest --set containers.name=fastapi \
-                    --set containers.ports.containerPort=8000 --set app=fileupmap \
+                    --set containers.ports.containerPort=80 --set app=fileupmap \
                     --set terminationGracePeriodSeconds=10
                   else
                     echo "skipping helm install of backend"
@@ -156,7 +156,7 @@ pipeline {
                   sleep 2
                   if [[ "$BUILD_FRONTEND" == true ]]; then
                     helm install k8sapp-$APP_NAME-frontend . --namespace $NAMESPACE --set service.namespace=$NAMESPACE \
-                    --set service.port=80 --set service.targetPort=80 --set nameOverride=$APP_NAME-frontend \
+                    --set service.port=80 --set nameOverride=$APP_NAME-frontend \
                     --set fullnameOverride=$APP_NAME-frontend --set namespace=${NAMESPACE} \
                     --set image.repository=${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend \
                     --set image.tag=latest --set containers.name=react \
