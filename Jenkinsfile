@@ -44,7 +44,7 @@ pipeline {
                 #!/bin/bash
                 set -x
                 ls -ltra
-                if [[ $BUILD_BACKEND == true ]]; then
+                if [[ "$BUILD_BACKEND" == true ]]; then
                   docker build \
                   --no-cache --network=host \
                   -t ${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend:latest \
@@ -64,7 +64,7 @@ pipeline {
                 '''
                 #!/bin/bash
                 set -x
-                if [[ $BUILD_FRONTEND == true ]]; then
+                if [[ "$BUILD_FRONTEND" == true ]]; then
                   docker build \
                   --no-cache --network=host \
                   -t $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend:latest \
@@ -82,7 +82,7 @@ pipeline {
             steps {
                 sh(label: 'ECR docker push frontend', script:
                 '''
-                if [[ $BUILD_FRONTEND == true ]]; then
+                if [[ "$BUILD_FRONTEND" == true ]]; then
                   docker push $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-frontend:latest
                 else
                   echo "skipping frontend image push"
@@ -91,7 +91,7 @@ pipeline {
                 )
                 sh(label: 'ECR docker push backend', script:
                 '''
-                if [[ $BUILD_BACKEND == true ]]; then
+                if [[ "$BUILD_BACKEND" == true ]]; then
                   docker push $AWSID.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend:latest
                 else
                   echo "skipping backend image push"
@@ -124,13 +124,13 @@ pipeline {
                 chmod +x ./kubectl
                 if ./kubectl get namespace $NAMESPACE > /dev/null 2>&1; then
                   echo "Namespace $NAMESPACE already exists"
-                  if [[ $BUILD_BACKEND == true ]]; then
+                  if [[ "$BUILD_BACKEND" == true ]]; then
                     ./kubectl rollout restart deploy/$APP_NAME-backend-deploy -n $NAMESPACE
                   else
                     echo "skipping kubectl rollout for backend"
                   fi
                   sleep 5
-                  if [[ $BUILD_FRONTEND == true ]]; then
+                  if [[ "$BUILD_FRONTEND" == true ]]; then
                     ./kubectl rollout restart deploy/$APP_NAME-frontend-deploy -n $NAMESPACE
                   else
                     echo "skipping kubectl rollout for frontend"
@@ -140,7 +140,7 @@ pipeline {
                   ./kubectl create ns $NAMESPACE
                   git clone https://github.com/sktrinh12/helm-basic-app-chart.git
                   cd helm-basic-app-chart
-                  if [[ $BUILD_BACKEND == true ]]; then
+                  if [[ "$BUILD_BACKEND" == true ]]; then
                     helm install k8sapp-$APP_NAME-backend . --namespace $NAMESPACE --set service.namespace=$NAMESPACE \
                     --set service.port=80 --set service.targetPort=8000 --set nameOverride=$APP_NAME-backend \
                     --set fullnameOverride=$APP_NAME-backend --set namespace=${NAMESPACE} \
@@ -152,7 +152,7 @@ pipeline {
                     echo "skipping helm install of backend"
                   fi
                   sleep 2
-                  if [[ $BUILD_FRONTEND == true ]]; then
+                  if [[ "$BUILD_FRONTEND" == true ]]; then
                     helm install k8sapp-$APP_NAME-frontend . --namespace $NAMESPACE --set service.namespace=$NAMESPACE \
                     --set service.port=80 --set service.targetPort=80 --set nameOverride=$APP_NAME-frontend \
                     --set fullnameOverride=$APP_NAME-frontend --set namespace=${NAMESPACE} \
