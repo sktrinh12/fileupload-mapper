@@ -139,7 +139,6 @@ pipeline {
                   fi
                 else
                   echo "pods $APP_NAME do not exist; deploy using helm"
-                  ./kubectl create ns $NAMESPACE
                   git clone https://github.com/sktrinh12/helm-basic-app-chart.git
                   cd helm-basic-app-chart
                   if [[ "$BUILD_BACKEND" == true ]]; then
