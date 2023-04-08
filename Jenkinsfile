@@ -124,7 +124,7 @@ pipeline {
                 set -x
                 curl -LO https://storage.googleapis.com/kubernetes-release/release/\$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
                 chmod +x ./kubectl
-                if ./kubectl get pod -n $NAMESPACE -l app=$APP_NAME > /dev/null 2>&1; then
+                if ./kubectl get pod -n $NAMESPACE -l app=$APP_NAME | grep -q $APP_NAME; then
                   echo "$APP_NAME pods already exists"
                   if [[ "$BUILD_BACKEND" == true ]]; then
                     ./kubectl rollout restart deploy/$APP_NAME-backend-deploy -n $NAMESPACE
@@ -138,7 +138,7 @@ pipeline {
                     echo "skipping kubectl rollout for frontend"
                   fi
                 else
-                  echo "Namespace $NAMESPACE does not exist; deploy using helm"
+                  echo "pods $APP_NAME do not exist; deploy using helm"
                   ./kubectl create ns $NAMESPACE
                   git clone https://github.com/sktrinh12/helm-basic-app-chart.git
                   cd helm-basic-app-chart
