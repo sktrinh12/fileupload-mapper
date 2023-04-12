@@ -17,6 +17,7 @@ origins = [
     "http://localhost:3000",
     "localhost:3000",
     "http://fileupmap.frontend.kinnate",
+    "http://fileupmap.backend.kinnate",
 ]
 
 app.add_middleware(
