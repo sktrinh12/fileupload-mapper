@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Dropzone from './components/Dropzone'
 import GenInputContext from './components/GenInputContext'
+import AppVersion from './components/AppVersionTag'
 import './App.css'
 
 const initProj = 'KIN-'
@@ -97,6 +98,7 @@ function App() {
           loading={loading}
         />
       </div>
+      <AppVersion />
     </GenInputContext.Provider>
   )
 }
