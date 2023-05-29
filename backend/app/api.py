@@ -57,7 +57,7 @@ async def upload(
             df_list.append(df)
             df = pd.concat(df_list, ignore_index=True)
             with pd.ExcelWriter(excel_file, engine="xlsxwriter") as writer:
-                df.to_excel(writer, index=False)
+                df.to_excel(writer, index=False, sheet_name="Map")
         except Exception as e:
             raise HTTPException(status_code=404, detail=e)
 
