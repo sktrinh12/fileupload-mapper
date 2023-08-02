@@ -151,6 +151,7 @@ pipeline {
                     --set image.repository=${AWSID}.dkr.ecr.us-west-2.amazonaws.com/$APP_NAME-backend \
                     --set image.tag=latest --set containers.name=fastapi \
                     --set containers.ports.containerPort=80 --set app=$APP_NAME \
+										--set resources.limits.cpu=100m,resources.limits.memory=128Mi,resources.requests.cpu=100m,resources.requests.memory=128Mi \
                     --set terminationGracePeriodSeconds=10
                   else
                     echo "skipping helm install of backend"
@@ -164,6 +165,7 @@ pipeline {
                     --set image.tag=latest --set containers.name=react \
                     --set containers.ports.containerPort=80 --set app=$APP_NAME \
                     --set terminationGracePeriodSeconds=10 \
+										--set resources.limits.cpu=200m,resources.limits.memory=200Mi,resources.requests.cpu=100m,resources.requests.memory=128Mi \
                     --set containers.volumeMounts.name=fileupmap-config-volume \
                     --set containers.volumeMounts.mountPath='/usr/share/nginx/html/config.js' \
                     --set containers.volumeMounts.subPath=config.js \
